@@ -24,6 +24,9 @@ from database.models import (
 from contextlib import asynccontextmanager
 from database.session_sqlite import AsyncSQLiteSessionLocal
 
+from database.session_sqlite import sqlite_engine
+from database import Base
+
 
 @asynccontextmanager
 async def get_db_contextmanager():
@@ -315,10 +318,6 @@ class CSVDatabaseSeeder:
         except Exception as e:
             print(f"Unexpected error: {e}")
             raise
-
-
-from database.session_sqlite import sqlite_engine
-from database import Base
 
 
 async def main() -> None:
