@@ -66,7 +66,7 @@ class MovieCreateRequest(BaseModel):
     date: date
     score: float = Field(..., ge=0, le=100)
     overview: Optional[str] = None
-    status: Optional[Literal["Released", "Post Production", "In Production"]] = None
+    status: str = Field(..., description="Status must be Released, Post Production, etc.")
     budget: Decimal = Field(..., ge=0)
     revenue: Decimal = Field(..., ge=0)
     country: str = Field(..., min_length=2, max_length=3, description="ISO 3166-1 alpha-3 code")

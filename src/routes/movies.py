@@ -5,10 +5,9 @@ from sqlalchemy.future import select
 from sqlalchemy import func, desc
 from sqlalchemy.orm import selectinload
 
-from database.session_sqlite import get_sqlite_db as get_db
-from database.models import (
-    MovieModel, CountryModel, GenreModel, ActorModel, LanguageModel
-)
+# from database.session_sqlite import get_sqlite_db as get_db
+from database import get_db, MovieModel
+from database.models import CountryModel, GenreModel, ActorModel, LanguageModel
 from schemas.movies import (
     PaginatedMoviesResponse, MovieCreateRequest, MovieDetailedResponse, MovieUpdateRequest
 )
