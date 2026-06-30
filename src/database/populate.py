@@ -19,7 +19,16 @@ from database.models import (
     MoviesLanguagesModel,
     MovieModel
 )
-from database import get_db_contextmanager
+# from database import get_db_contextmanager
+
+from contextlib import asynccontextmanager
+from database.session_sqlite import AsyncSQLiteSessionLocal
+
+
+@asynccontextmanager
+async def get_db_contextmanager():
+    async with AsyncSQLiteSessionLocal() as session:
+        yield session
 
 CHUNK_SIZE = 1000
 
@@ -308,11 +317,18 @@ class CSVDatabaseSeeder:
             raise
 
 
+from database.session_sqlite import sqlite_engine
+from database import Base
+
+
 async def main() -> None:
     """
     The main async entry point for running the database seeder.
     Checks if the database is already populated, and if not, performs the seeding process.
     """
+    async with sqlite_engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+
     settings = get_settings()
     async with get_db_contextmanager() as db_session:
         seeder = CSVDatabaseSeeder(settings.PATH_TO_MOVIES_CSV, db_session)
