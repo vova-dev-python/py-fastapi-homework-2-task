@@ -1,4 +1,5 @@
-from datetime import date
+from datetime import date, datetime
+from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 from typing import List, Optional, Literal
 from pydantic import BaseModel, Field, field_validator, ConfigDict
@@ -16,6 +17,21 @@ def _validate_movie_date_logic(v):
     # max_date = date.today().replace(year=date.today().year + 10)
     # if v > max_date:
     #     raise ValueError("Date cannot be more than one year in the future.")
+    if v is None:
+        return v
+
+    if isinstance(v, str):
+        try:
+            v = datetime.strptime(v, "%Y-%m-%d").date()
+        except ValueError:
+            return v
+    elif isinstance(v, datetime):
+        v = v.date()
+
+    max_date = date.today() + relativedelta(years=1)
+    if v > max_date:
+        raise ValueError("Date cannot be more than one year in the future.")
+
     return v
 
 
@@ -50,7 +66,7 @@ class MovieListElement(BaseModel):
     name: str
     date: date
     score: float
-    overview: Optional[str] = None
+    overview: str
 
 
 class PaginatedMoviesResponse(BaseModel):
@@ -65,11 +81,11 @@ class MovieCreateRequest(BaseModel):
     name: str = Field(..., max_length=255)
     date: date
     score: float = Field(..., ge=0, le=100)
-    overview: Optional[str] = None
-    status: str = Field(..., description="Status must be Released, Post Production, etc.")
+    overview: str
+    status: Literal["Released", "Post Production", "In Production"] = Field(..., description="Status of the movie")
     budget: Decimal = Field(..., ge=0)
     revenue: Decimal = Field(..., ge=0)
-    country: str = Field(..., min_length=2, max_length=3, description="ISO 3166-1 alpha-3 code")
+    country: str = Field(..., min_length=2, max_length=3)
     genres: List[str]
     actors: List[str]
     languages: List[str]
